@@ -17,7 +17,7 @@ docker pull ghcr.io/filixpay/filix-checkout:v1.0
 docker run -d -p 3001:3001 --name filix-demo ghcr.io/filixpay/filix-checkout:v1.0
 ```
 ### 3. 本地访问
-打开浏览器访问：http://localhost:3001
+打开浏览器访问：http://localhost:3001?token=5589959526295284:toqMJxXtpSSyw-CH:1774572060.4abcae1be03e7f4686f75d7cf489dc6a6feb76b770f6cc8334853a985920184e
 
 ### 4. 服务器访问
 只需简单配置nginx。
@@ -40,5 +40,7 @@ docker run -d -p 3001:3001 --name filix-demo ghcr.io/filixpay/filix-checkout:v1.
 	    proxy_connect_timeout 60s;
 	}
 ```
-按上面配置即可在你域名下访问：https://your-domain/checkout
+按上面配置即可在你域名下访问：https://your-domain/checkout?token=5589959526295284:toqMJxXtpSSyw-CH:1774572060.4abcae1be03e7f4686f75d7cf489dc6a6feb76b770f6cc8334853a985920184e
 
+### 5. token 获取方法
+验证阶段可注册登录 https://www.filixpay.com/ ，进入订单页面创建订单，点击支付从 URL 中 copy token。实际运行时可通过 API 对接下单获取 token。
