@@ -20,9 +20,8 @@ docker run -d -p 3001:3001 \
   -e FILIXPAY_CLIENT_SECRET=ZGvV8gyVgAHkcvfIJkiQqt60Ct2TPTTx \
   ghcr.io/filixpay/filix-checkout:v1.0
 ```
-商户自己的 FILIXPAY_CLIENT_ID 和 FILIXPAY_CLIENT_SECRET 需要在 [FilixPay](https://www.filixpay.com/zh/dashboard/developer "FilixPay 开发者中心")。
-
-
+商户自己的 FILIXPAY_CLIENT_ID 和 FILIXPAY_CLIENT_SECRET 需要在 [FilixPay](https://www.filixpay.com/zh/dashboard/developer "FilixPay 开发者中心") 商户中心 - 开发者中心获取。
+<img width="1597" height="588" alt="image" src="https://github.com/user-attachments/assets/24f5c775-5630-4188-a702-67ba7db03eb3" />
 
 ### 3. 本地访问
 打开浏览器访问：http://localhost:3001/checkout/order
