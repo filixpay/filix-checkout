@@ -44,5 +44,5 @@ docker run -d -p 3001:3001 \
 	    proxy_connect_timeout 60s;
 	}
 ```
-打开浏览器访问：http://yourdomain.com/checkout/order，即可在客户独立域名完整体验从下单到支付全流程。
+打开浏览器访问：yourdomain.com/checkout/order，即可在客户独立域名完整体验从下单到支付全流程。
 
