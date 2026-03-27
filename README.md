@@ -1,4 +1,4 @@
-# FilixPay Checkout - 独立域名部署收银台 (演示版)
+# [FilixPay](https://www.filixpay.com "FilixPay 官网") Checkout - 独立域名部署收银台 (演示版)
 
 这是一个基于 TypeScript 构建的收银台项目演示 Docker 镜像。本项目旨在展示现代化的支付集成架构与容器化部署方案。
 
@@ -20,6 +20,10 @@ docker run -d -p 3001:3001 \
   -e FILIXPAY_CLIENT_SECRET=ZGvV8gyVgAHkcvfIJkiQqt60Ct2TPTTx \
   ghcr.io/filixpay/filix-checkout:v1.0
 ```
+商户自己的 FILIXPAY_CLIENT_ID 和 FILIXPAY_CLIENT_SECRET 需要在 [FilixPay](https://www.filixpay.com/zh/dashboard/developer "FilixPay 开发者中心")。
+
+
+
 ### 3. 本地访问
 打开浏览器访问：http://localhost:3001/checkout/order
 
