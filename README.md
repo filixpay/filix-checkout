@@ -1,4 +1,4 @@
-# [FilixPay](https://www.filixpay.com "FilixPay 官网") Checkout - 独立域名部署收银台 (演示版)
+# [FilixPay](https://www.filixpay.com "FilixPay 跨境支付官网") Checkout - 独立域名部署收银台 (演示版)
 
 这是一个基于 TypeScript 构建的收银台项目演示 Docker 镜像。本项目旨在展示现代化的支付集成架构与容器化部署方案。
 
