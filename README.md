@@ -17,7 +17,7 @@ docker pull ghcr.io/filixpay/filix-checkout:v1.0
 docker run -d -p 3001:3001 \
   --name filix-demo \
   -e FILIXPAY_CLIENT_ID=merchant-api-22189219481889 \
-  -e FILIXPAY_CLIENT_SECRET=thisisdemosecret \
+  -e FILIXPAY_CLIENT_SECRET=ZGvV8gyVgAHkcvfIJkiQqt60Ct2TPTTx \
   ghcr.io/filixpay/filix-checkout:v1.0
 ```
 ### 3. 本地访问
