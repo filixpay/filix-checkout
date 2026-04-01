@@ -28,8 +28,8 @@ docker pull ghcr.io/filixpay/filix-checkout:v1.0
 ```bash
 docker run -d -p 3001:3001 \
   --name filix-demo \
-  -e FILIXPAY_CLIENT_ID=merchant-api-22189219481889 \
-  -e FILIXPAY_CLIENT_SECRET=ZGvV8gyVgAHkcvfIJkiQqt60Ct2TPTTx \
+  -e FILIXPAY_BACKEND_CLIENT_ID=merchant-api-22189219481889 \
+  -e FILIXPAY_BACKEND_CLIENT_SECRET=ZGvV8gyVgAHkcvfIJkiQqt60Ct2TPTTx \
   ghcr.io/filixpay/filix-checkout:v1.0
 ```
 商户自己的 FILIXPAY_CLIENT_ID 和 FILIXPAY_CLIENT_SECRET 需要在 [FilixPay](https://www.filixpay.com/zh/dashboard/developer "FilixPay 开发者中心") 商户中心 - 开发者中心获取。
