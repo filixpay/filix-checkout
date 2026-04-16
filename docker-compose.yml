@@ -1,0 +1,163 @@
+# docker-compose down -v --remove-orphans
+# docker-compose up -d
+# docker logs -f --tail 500 filixdb-prod-wildfly
+# docker logs -f --tail 500 filixdb-prod-keycloak
+
+version: '3.8'
+
+services:
+
+  # ================= 缓存服务 =================
+  redis:
+    image: redis:7.2
+    container_name: ${COMPOSE_PROJECT_NAME}-redis
+    restart: unless-stopped
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru --requirepass ${REDIS_PASSWORD} --appendonly yes --appendfsync everysec
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis/data:/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ================= DB 服务 =================      
+  mysql:
+    image: mysql:8.0
+    container_name: ${COMPOSE_PROJECT_NAME}-mysql
+    restart: always
+    env_file:
+      - .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      TZ: ${TZ}
+    ports:
+      - "${MYSQL_PORT}:3306"
+    volumes:
+      - ./mysql/mysql/data:/var/lib/mysql
+      - ./mysql/mysql/conf:/etc/mysql/conf.d
+      - ./mysql/mysql/logs:/var/log/mysql
+      - ./mysql/mysql/init-scripts:/docker-entrypoint-initdb.d      
+    command:
+      - "--lower-case-table-names=1"
+      - "--character-set-server=utf8mb4"
+      - "--collation-server=utf8mb4_unicode_ci"
+      - "--max-connections=200"
+      - "--innodb-buffer-pool-size=512M"
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1.0'
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"     
+    networks:
+      - app-network
+
+  # ================= 认证服务 =================    
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0.0
+    container_name: ${COMPOSE_PROJECT_NAME}-keycloak
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8080:8080"   # HTTP（内部或调试用）
+      - "8443:8443"   # HTTPS（对外）
+    volumes:
+      - ./certs:/certs:ro   # 证书目录（需提前准备）
+    environment:
+      # Admin 账号（仅首次启动生效）
+      - KC_BOOTSTRAP_ADMIN_USERNAME=${KEYCLOAK_ADMIN_USER}
+      - KC_BOOTSTRAP_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
+
+      # 数据库：连接同网络的 mysql 容器
+      - KC_DB=mysql
+      - KC_DB_URL=jdbc:mysql://mysql:3306/keycloak?useSSL=false&characterEncoding=UTF-8&serverTimezone=UTC
+      - KC_DB_USERNAME=${KEYCLOAK_DB_USER}
+      - KC_DB_PASSWORD=${KEYCLOAK_DB_PASSWORD}
+
+      # 主机名 & HTTPS
+      - KC_HOSTNAME=${KEYCLOAK_HOSTNAME}
+      # - KC_PROXY=passthrough
+      - KC_HOSTNAME_STRICT=false
+      - KC_HOSTNAME_STRICT_HTTPS=false
+      - KC_PROXY_HEADERS=xforwarded      
+      - KC_HTTPS_CERTIFICATE_FILE=/certs/filixpay.com.pem
+      - KC_HTTPS_CERTIFICATE_KEY_FILE=/certs/filixpay.com.key
+
+      # 其他
+      - KC_HEALTH_ENABLED=true
+      - KC_METRICS_ENABLED=true
+      - KC_LOG_LEVEL=INFO
+      - KC_HTTP_RELATIVE_PATH=/auth
+      # 单节点运行 性能更好
+      - KC_CACHE=local 
+    command: ["start"]
+    networks:
+      - app-network
+
+  # ================= 应用服务 =================
+  wildfly:
+    image: release-wildfly:38.0.1.Final-jdk21
+    container_name: ${COMPOSE_PROJECT_NAME}-wildfly
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    
+    ports:
+      - "18080:8080"
+      - "18443:8443"
+      - "9990:9990"
+      - "8787:8787"
+    
+    environment:
+      - JAVA_OPTS=${JAVA_OPTS}
+      # Redis 配置 - 使用服务名而非 IP
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      # MySQL 配置
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_NAME=${MYSQL_DATABASE}
+      - DB_USER=${MYSQL_USER}
+      - DB_PASSWORD=${MYSQL_PASSWORD}
+    
+    volumes:
+      # 部署目录挂载 - 使用相对路径
+      - ./wildfly/deployments:/opt/jboss/wildfly/standalone/deployments
+      # 上传文件挂载
+      - ./upload:/data/upload
+    
+    command: >
+      /bin/sh -c "
+        echo 'Creating admin user...' &&
+        /opt/jboss/wildfly/bin/add-user.sh ${WILDFLY_ADMIN_USER} ${WILDFLY_ADMIN_PASS} --silent &&
+        echo 'Starting WildFly...' &&
+        /opt/jboss/wildfly/bin/standalone.sh -b 0.0.0.0 -bmanagement 0.0.0.0 --debug '*:8787'
+      "
+    networks:
+      - app-network
+
+# ================= 网络定义 =================
+networks:
+  app-network:
+    driver: bridge
