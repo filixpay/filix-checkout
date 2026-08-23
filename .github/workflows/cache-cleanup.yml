@@ -1,0 +1,49 @@
+name: Cleanup old caches
+
+on:
+  schedule:
+    - cron: '0 2 * * *'  # 每天凌晨2点(UTC)自动运行
+  workflow_dispatch:      # 支持在 Actions 页面手动触发
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: read
+    steps:
+      - name: Show current cache usage
+        run: |
+          echo "=== 清理前缓存概况 ==="
+          gh api repos/${{ github.repository }}/actions/caches --paginate \
+            | jq '{total_count, total_size_mb: (([.actions_caches[].size_in_bytes] | add // 0) / 1024 / 1024 | floor)}'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Delete caches older than 3 days
+        run: |
+          CUTOFF=$(date -d '3 days ago' -u +%Y-%m-%dT%H:%M:%SZ)
+          echo "删除 $CUTOFF 之前未被访问的缓存..."
+
+          IDS=$(gh api repos/${{ github.repository }}/actions/caches --paginate \
+            | jq -r --arg cutoff "$CUTOFF" \
+              '.actions_caches[] | select(.last_accessed_at < $cutoff) | .id')
+
+          if [ -z "$IDS" ]; then
+            echo "没有需要清理的旧缓存。"
+          else
+            echo "$IDS" | while read -r id; do
+              echo "删除 cache id: $id"
+              gh api -X DELETE repos/${{ github.repository }}/actions/caches/$id || true
+            done
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Show cache usage after cleanup
+        run: |
+          echo "=== 清理后缓存概况 ==="
+          gh api repos/${{ github.repository }}/actions/caches --paginate \
+            | jq '{total_count, total_size_mb: (([.actions_caches[].size_in_bytes] | add // 0) / 1024 / 1024 | floor)}'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
