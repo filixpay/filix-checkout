@@ -8,6 +8,7 @@ See [docs/README.md](docs/README.md) for the full index.
 
 | Document | Description |
 |----------|-------------|
+| [docs/merchant-deployment.md](docs/merchant-deployment.md) | **Merchant guide** — deploy on your own server with Docker / GHCR and custom domain |
 | [docs/crypto-integration.md](docs/crypto-integration.md) | Self-hosted TRON-USDT (CRYPTO channel) integration |
 | [docs/risk-resume-integration.md](docs/risk-resume-integration.md) | PRE_AUTH risk blocking, pending review, and USER_RESUME flow |
 
