@@ -269,6 +269,7 @@ export default function CheckoutClient() {
   const [walletInlineError, setWalletInlineError] = useState<string | null>(null);
 
   const pollingRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const returnPageUrlRef = useRef<string | null>(null);
   const pinErrorRef = useRef(false);
 
   useEffect(() => {
@@ -436,9 +437,10 @@ export default function CheckoutClient() {
         const res = await fetch(`/api/checkout/pay?token=${encodeURIComponent(token!)}`);
         const data = await res.json();
         if (data.code === 'SUCCESS' && data.data.orderStatus === 'SUCCESS') {
-          // #region agent log
-          fetch('http://127.0.0.1:7505/ingest/03c7169b-b939-4449-adff-288ca72ebc9d',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'c21a6a'},body:JSON.stringify({sessionId:'c21a6a',hypothesisId:'C',location:'CheckoutClient.tsx:poll',message:'poll saw order success',data:{action:'reload',orderStatus:data.data.orderStatus},timestamp:Date.now()})}).catch(()=>{});
-          // #endregion
+          if (returnPageUrlRef.current) {
+            window.location.href = returnPageUrlRef.current;
+            return;
+          }
           location.reload();
           return;
         }
@@ -532,7 +534,8 @@ export default function CheckoutClient() {
           setShowPinModal(false);
           setPinError(null);
         },
-        onProcessing: () => {
+        onProcessing: (returnUrl) => {
+          returnPageUrlRef.current = returnUrl || null;
           startPolling();
         },
         onReceipt: (value) =>
