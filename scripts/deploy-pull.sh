@@ -1,7 +1,9 @@
 #!/bin/bash
 # Pull pre-built image from GHCR and restart (no local docker build).
 #
-# Set DEPLOY_ENV_FILE to a file containing:
+# Default credentials file: /etc/filix-checkout/ghcr.env
+# Override with DEPLOY_ENV_FILE=/path/to/env if needed.
+# The file should contain:
 #   GHCR_USER=your-github-username
 #   GHCR_TOKEN=ghp_...   # classic PAT with read:packages
 #
@@ -14,7 +16,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-ENV_FILE="${DEPLOY_ENV_FILE:-}"
+ENV_FILE="${DEPLOY_ENV_FILE:-/etc/filix-checkout/ghcr.env}"
 
 IMAGE="${CHECKOUT_IMAGE:-ghcr.io/filixpay/filix-checkout:latest}"
 CONTAINER_NAME="${CHECKOUT_CONTAINER:-filix-checkout}"
