@@ -77,6 +77,10 @@ export function applyPaymentSessionJson(
     return false;
   }
 
+  // #region agent log
+  fetch('http://127.0.0.1:7505/ingest/03c7169b-b939-4449-adff-288ca72ebc9d',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'c21a6a'},body:JSON.stringify({sessionId:'c21a6a',hypothesisId:'B',location:'payment-handoff.ts:apply',message:'handoff branch inputs',data:{paymentState:data.paymentState??null,hasPaymentUrl:Boolean(data.paymentUrl),hasQr:Boolean(data.qrCodeUrl),resultCode:data.resultCode??null},timestamp:Date.now()})}).catch(()=>{});
+  // #endregion
+
   if (data.paymentState === 'SUCCEEDED') {
     handlers.onImmediateSuccess();
     return true;
