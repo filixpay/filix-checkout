@@ -51,8 +51,10 @@ function getAccordionContent(method: PaymentMethod) {
   if (code === 'CRYPTO' || code === 'NOWPAYMENTS') {
     return {
       variant: 'info' as const,
-      title: '链上转账',
-      body: method.hint || '系统将生成精确转账金额与收款地址，请在有效期内完成链上转账。',
+      title: 'USDT 付款说明',
+      body:
+        method.hint ||
+        'USDT（TRC20）付款说明：\n1. 支持 TRON 链上 USDT 转账，链上免 Gas（无需额外矿工费）。\n2. 推荐使用 TronLink 钱包完成付款。\n3. 若尚无钱包，请先前往 OKX.com 开户后再转账。\n4. 点击「前往付款」后，请按页面生成的精确金额与收款地址，在有效期内完成链上转账。',
     };
   }
 

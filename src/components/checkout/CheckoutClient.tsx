@@ -341,6 +341,10 @@ export default function CheckoutClient() {
         return;
       }
       const nextView = data.data as CheckoutView;
+      if (nextView.orderStatus === 'SUCCESS' && nextView.resultPageUrl) {
+        window.location.href = nextView.resultPageUrl;
+        return;
+      }
       setView(nextView);
       setState('ready');
 
@@ -437,8 +441,9 @@ export default function CheckoutClient() {
         const res = await fetch(`/api/checkout/pay?token=${encodeURIComponent(token!)}`);
         const data = await res.json();
         if (data.code === 'SUCCESS' && data.data.orderStatus === 'SUCCESS') {
-          if (returnPageUrlRef.current) {
-            window.location.href = returnPageUrlRef.current;
+          const resultPageUrl = returnPageUrlRef.current || data.data.resultPageUrl;
+          if (resultPageUrl) {
+            window.location.href = resultPageUrl;
             return;
           }
           location.reload();

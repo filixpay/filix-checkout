@@ -66,22 +66,36 @@ export function applyPaymentSessionJson(
     return false;
   }
 
-  if (json.resultCode === 'SUCCESS' || json.data?.resultCode === 'SUCCESS') {
+  const data = json.data;
+
+  // Balance / wallet: jump to the shared return page like Stripe/PayPal.
+  const walletState = data?.paymentState;
+  if (
+    data?.paymentUrl &&
+    (walletState === 'SUCCEEDED' ||
+      walletState === 'PROCESSING' ||
+      data.resultCode === 'SUCCEEDED' ||
+      data.resultCode === 'PROCESSING')
+  ) {
+    window.location.href = data.paymentUrl;
+    return true;
+  }
+
+  if (json.resultCode === 'SUCCESS' || data?.resultCode === 'SUCCESS') {
+    if (data?.paymentUrl) {
+      window.location.href = data.paymentUrl;
+      return true;
+    }
     handlers.onImmediateSuccess();
     return true;
   }
 
-  const data = json.data;
   if (!data) {
     handlers.onError('未获取到有效的支付引导信息');
     return false;
   }
 
   if (data.paymentState === 'SUCCEEDED') {
-    if (data.paymentUrl) {
-      window.location.href = data.paymentUrl;
-      return true;
-    }
     handlers.onImmediateSuccess();
     return true;
   }

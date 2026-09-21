@@ -52,6 +52,8 @@ export interface CheckoutView {
   expirySeconds?: number;
   availablePaymentMethods?: PaymentMethod[];
   returnUrl?: string;
+  /** FilixPay unified result page — same destination as Stripe/PayPal return. */
+  resultPageUrl?: string;
   statusText?: string;
 }
 
