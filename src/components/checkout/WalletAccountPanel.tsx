@@ -2,6 +2,7 @@
 
 import styles from '@/app/checkout.module.css';
 import type { WalletAccount } from '@/types/checkout';
+import { formatMerchantAccountLabel } from '@/lib/account-label';
 import { maskEmailsInText } from '@/lib/mask';
 
 interface WalletAccountPanelProps {
@@ -185,7 +186,7 @@ export default function WalletAccountPanel({
               onClick={() => !isInsufficient && onSelect(account)}
             >
               <div className={styles.walletItemInfo}>
-                <div className={styles.walletLabel}>{account.name}</div>
+                <div className={styles.walletLabel}>{formatMerchantAccountLabel(account.name)}</div>
                 <div className={styles.walletBalance}>
                   {balanceUnknown ? (
                     <span className={styles.walletBalanceValue}>提交时将校验可用余额</span>

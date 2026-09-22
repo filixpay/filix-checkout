@@ -1,6 +1,7 @@
 'use client';
 
 import styles from '@/app/checkout.module.css';
+import { formatMerchantAccountLabel } from '@/lib/account-label';
 import type { WalletAccount } from '@/types/checkout';
 
 interface WalletSelectorProps {
@@ -33,7 +34,7 @@ export default function WalletSelector({ accounts, totalAmount, currency, onSele
                 onClick={() => !isInsufficient && onSelect(account)}
               >
                 <div className={styles.walletItemInfo}>
-                  <div className={styles.walletLabel}>{account.name}</div>
+                  <div className={styles.walletLabel}>{formatMerchantAccountLabel(account.name)}</div>
                   <div className={styles.walletBalance}>
                     {balanceUnknown ? (
                       <span className={styles.walletBalanceValue}>提交时将校验可用余额</span>

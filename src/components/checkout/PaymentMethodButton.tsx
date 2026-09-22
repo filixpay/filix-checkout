@@ -1,6 +1,7 @@
 'use client';
 
 import styles from '@/app/checkout.module.css';
+import { formatMerchantAccountLabel } from '@/lib/account-label';
 import type { PaymentMethod, WalletAccount } from '@/types/checkout';
 import { maskEmailsInText } from '@/lib/mask';
 import WalletAccountPanel from './WalletAccountPanel';
@@ -63,7 +64,7 @@ function getAccordionContent(method: PaymentMethod) {
     return {
       variant: 'info' as const,
       title: '信用额度',
-      body: `${account.name} 可用额度：${account.availableAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      body: `${formatMerchantAccountLabel(account.name)} 可用额度：${account.availableAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
     };
   }
 

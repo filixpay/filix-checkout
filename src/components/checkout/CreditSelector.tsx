@@ -1,6 +1,7 @@
 'use client';
 
 import styles from '@/app/checkout.module.css';
+import { formatMerchantAccountLabel } from '@/lib/account-label';
 import type { CreditAccount } from '@/types/checkout';
 
 interface CreditSelectorProps {
@@ -30,7 +31,7 @@ export default function CreditSelector({ accounts, totalAmount, currency, onSele
                 onClick={() => !isInsufficient && onSelect(account)}
               >
                 <div className={styles.walletItemInfo}>
-                  <div className={styles.walletLabel}>{account.name}</div>
+                  <div className={styles.walletLabel}>{formatMerchantAccountLabel(account.name)}</div>
                   <div className={styles.walletBalance}>
                     可用额度: <span className={styles.walletBalanceValue}>{currency} {account.availableAmount.toFixed(2)}</span>
                   </div>
